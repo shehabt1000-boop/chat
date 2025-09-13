@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>شات شهاب</title>
+  <style>
+    /* أساسيات */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Cairo", Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+
+
+
+    .chat-container {
+      width: 100%;
+      max-width: 420px;
+      height: 100dvh;
+      background: #fff;
+      border: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+
+
+
+    /* الهيدر */
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: linear-gradient(90deg,#000,#0a3d62);
+      color: #fff;
+    }
+    .chat-header .avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    .chat-header .title { margin: 0; font-size: 20px; font-weight: 800; }
+    .logout-btn {
+      margin-right: auto;
+      padding: 8px 12px;
+      background: linear-gradient(90deg, #c0392b, #e74c3c);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+
+
+
+    /* شريط التنقل */
+    .chat-nav {
+      display: flex;
+      background: linear-gradient(90deg,#0a3d62,#000);
+    }
+    .nav-btn {
+      flex: 1;
+      padding: 12px 6px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .nav-btn.active,
+    .nav-btn:hover { background: rgba(255,255,255,0.08); }
+
+
+
+
+    /* المحتوى الرئيسي */
+    .chat-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: #fafafa;
+    }
+
+
+
+
+    /* صفحة الدردشة */
+    .chat-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+
+
+
+    .messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+
+
+
+    /* فقاعات الرسائل */
+    .bubble {
+      max-width: 75%;
+      padding: 8px 12px;
+      border-radius: 16px;
+      line-height: 1.5;
+      word-wrap: break-word;
+      width: fit-content;
+    }
+    .bubble.sent { align-self: flex-end; background: #dcf8c6; }
+    .bubble.recv { align-self: flex-start; background: #fff; }
+
+
+
+
+    /* شريط الكتابة */
+    .chat-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: linear-gradient(90deg,#000,#0a3d62);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      direction: ltr;
+    }
+
+
+
+
+    .left-tools {
+      display: flex;
+      gap: 6px;
+    }
+
+
+
+
+    .icon-btn {
+      width: 38px; height: 38px;
+      border: none; border-radius: 10px;
+      background: rgba(255,255,255,0.15);
+      color: #fff; font-size: 18px;
+      cursor: pointer;
+    }
+
+
+
+
+    .msg-input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 22px;
+      border: 1px solid #ccc;
+      outline: none;
+      background: #fff;
+      font-size: 14px;
+      direction: rtl;
+    }
+
+
+
+
+    /* زر الإرسال */
+    .send-btn {
+      width: 42px; height: 42px;
+      border: none; border-radius: 50%;
+      background: #25d366;
+      color: #fff; font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+
+    /* ---------------------------------------------------------------------------------- */
+    /* أنماط صفحة الأعضاء */
+    /* ---------------------------------------------------------------------------------- */
+
+
+    .members-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      padding: 8px 12px;
+      border-radius: 24px;
+      border: 1px solid #ddd;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      direction: rtl;
+    }
+
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      direction: rtl;
+    }
+
+
+    .search-bar button {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: #888;
+      cursor: pointer;
+    }
+
+
+    .members-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+
+    .member-item-wrapper {
+      padding: 2px;
+      background-image: linear-gradient(to right, #000, #0a3d62);
+      border-radius: 16px;
+    }
+    .member-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #fff;
+      border-radius: 14px;
+    }
+    .member-avatar {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .member-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .member-name {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    .member-id {
+      margin: 0;
+      font-size: 12px;
+      color: #888;
+      direction: ltr;
+    }
+    .member-status {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .status-online { background-color: #25d366; }
+    .status-offline { background-color: #ccc; }
+
+
+    /* ---------------------------------------------------------------------------------- */
+    /* أنماط صفحة الإعدادات */
+    /* ---------------------------------------------------------------------------------- */
+    .settings-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+
+    .settings-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .settings-section-title {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #0a3d62;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 4px;
+    }
+    .settings-option {
+      display: flex;
+      flex-wrap: wrap; /* يسمح للعناصر بالنزول لسطر جديد على الشاشات الصغيرة */
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .settings-option:last-child { border-bottom: none; }
+    .settings-option .label {
+      flex: 1;
+      font-size: 15px;
+      color: #555;
+    }
+    .settings-btn, .settings-btn-themed {
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      white-space: nowrap;
+      color: #fff;
+      border: none;
+    }
+    .settings-btn-themed {
+      background: linear-gradient(90deg, #0a3d62, #000);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+
+    /* نطاق التنسيق */
+    .settings-input, .settings-input-url {
+      height: 40px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .settings-input { width: 40px; }
+    .settings-input-url { flex: 1; }
+    .settings-range-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .settings-range {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 6px;
+      background: #ddd;
+      border-radius: 3px;
+      outline: none;
+    }
+    .settings-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #0a3d62;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .settings-range-value {
+      font-size: 14px;
+      color: #0a3d62;
+      font-weight: bold;
+      width: 30px;
+      text-align: right;
+    }
+
+
+    /* ---------------------------------------------------------------------------------- */
+    /* أنماط صفحة البروفايل */
+    /* ---------------------------------------------------------------------------------- */
+    .profile-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+
+    .profile-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      align-items: center;
+    }
+    .profile-avatar-container { position: relative; }
+    .profile-avatar {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 4px solid #0a3d62;
+      object-fit: cover;
+    }
+    .profile-status {
+      position: absolute;
+      bottom: 6px; right: 6px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+    }
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0a3d62;
+      margin: 8px 0 0 0;
+    }
+    .profile-status-text {
+      font-size: 14px;
+      color: #888;
+      margin: 0;
+    }
+    .profile-edit-btn {
+      margin-top: 8px;
+      background: #0a3d62;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .profile-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+    .profile-detail-card {
+      background: #fafafa;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    .profile-detail-card .label {
+      font-size: 12px;
+      color: #555;
+    }
+    .profile-detail-card .value {
+      font-size: 16px;
+      font-weight: bold;
+      color: #0a3d62;
+    }
+    /* ---------------------------------------------------------------------------------- */
+    /* أنماط صفحات المصادقة (تسجيل الدخول، التسجيل) */
+    /* ---------------------------------------------------------------------------------- */
+    .auth-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #f0f0f0;
+      gap: 20px;
+      direction: rtl;
+      text-align: right;
+    }
+    .auth-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0a3d62;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    .auth-card {
+      background: #fff;
+      width: 100%;
+      max-width: 340px;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+
+    .auth-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+
+    .auth-input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      direction: rtl;
+    }
+
+
+    .form-btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+
+    .form-btn-confirm {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      background: linear-gradient(90deg, #0a3d62, #000);
+      cursor: pointer;
+    }
+
+
+    .form-btn-cancel {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 12px;
+      color: #0a3d62;
+      background: #eee;
+      cursor: pointer;
+    }
+
+
+    .form-text {
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      margin-top: -8px;
+    }
+
+
+    .form-text-link {
+      color: #0a3d62;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+
+    .profile-avatar-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+
+    .signup-avatar-container {
+      position: relative;
+    }
+
+
+    .signup-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #0a3d62;
+    }
+
+
+    .signup-avatar-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+
+    .signup-avatar-btn {
+      background: #eee;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+
+    .gender-select {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+
+    .gender-option {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+
+    .gender-option.selected {
+      background: #0a3d62;
+      color: #fff;
+      border-color: #0a3d62;
+    }
+
+
+    /* شاشة التحميل */
+    #loadingScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      z-index: 1000;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+
+    .loading-spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- الهيدر -->
+    <header class="chat-header" id="chatHeader" style="display: none;">
+      <img src="https://images.pexels.com/photos/2055230/pexels-photo-2055230.jpeg" class="avatar" alt="avatar" />
+      <h1 class="title">شات شهاب</h1>
+      <button class="logout-btn" onclick="openPage('logout', this)">🚪 تسجيل الخروج</button>
+    </header>
+
+
+    <!-- شريط التنقل تحت الهيدر -->
+    <nav class="chat-nav" id="chatNav" style="display: none;">
+      <button class="nav-btn" onclick="openPage('chat', this)">الدردشة</button>
+      <button class="nav-btn" onclick="openPage('members', this)">الأعضاء</button>
+      <button class="nav-btn" onclick="openPage('settings', this)">الإعدادات</button>
+      <button class="nav-btn" onclick="openPage('profile', this)">البروفايل</button>
+    </nav>
+
+
+    <!-- المحتوى الرئيسي (سيتم ملؤه بواسطة JavaScript) -->
+    <main class="chat-content" id="content">
+      <!-- هنا سيتم عرض الصفحات المختلفة (تسجيل الدخول، الدردشة، إلخ) -->
+    </main>
+
+
+    <!-- شاشة التحميل -->
+    <div id="loadingScreen">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
+
+  <script>
+    // تحميل الصفحة الافتراضية عند بدء التشغيل
+    window.addEventListener("DOMContentLoaded", () => openPage("logout")); // تبدأ الآن بصفحة تسجيل الدخول
+
+
+    let currentUser = {
+      name: "علي مصطفى",
+      gender: "male",
+      avatar: "https://images.pexels.com/photos/2055230/pexels-photo-2055230.jpeg"
+    };
+
+
+    /**
+     * يزيل الحالة النشطة من جميع الأزرار ويضيفها إلى الزر المحدد.
+     * @param {HTMLElement} btn - الزر الذي يجب تفعيله.
+     */
+    function setActive(btn) {
+      // إزالة "active" من كل الأزرار
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      // إضافة "active" إلى الزر المحدد
+      if (btn) btn.classList.add("active");
+    }
+
+
+    /**
+     * يفتح صفحة جديدة ويعرض محتواها.
+     * @param {string} page - اسم الصفحة المراد فتحها (مثل 'chat' أو 'members').
+     * @param {HTMLElement} btn - الزر الذي تم النقر عليه.
+     */
+    function openPage(page, btn) {
+      const content = document.getElementById("content");
+      const header = document.getElementById("chatHeader");
+      const nav = document.getElementById("chatNav");
+
+
+      if (page === "logout") {
+        // إخفاء الهيدر وشريط التنقل عند تسجيل الخروج
+        header.style.display = "none";
+        nav.style.display = "none";
+        showAuthPage('initial');
+        return;
+      } else {
+        // إظهار الهيدر وشريط التنقل في الصفحات الأخرى
+        header.style.display = "flex";
+        nav.style.display = "flex";
+      }
+
+
+      setActive(btn);
+
+
+      if (page === "chat") {
+        content.innerHTML = `
+          <section class="chat-page">
+            <div class="messages" id="messages">
+              <!-- رسائل تجريبية -->
+              <div class="bubble recv">أهلاً بك في شات شهاب 👋</div>
+            </div>
+
+
+            <div class="chat-input">
+              <div class="left-tools">
+                <button class="icon-btn" id="photoBtn" title="إرسال صورة">📷</button>
+                <button class="icon-btn" id="micBtn" title="تسجيل صوت">🎤</button>
+              </div>
+
+
+              <input class="msg-input" id="msgInput" type="text" placeholder="اكتب رسالتك..." />
+
+
+              <button class="send-btn" id="sendBtn" title="إرسال">➤</button>
+            </div>
+          </section>
+        `;
+
+
+        // تهيئة وظائف صفحة الدردشة
+        const messages = document.getElementById("messages");
+        const msgInput = document.getElementById("msgInput");
+        const sendBtn  = document.getElementById("sendBtn");
+
+
+        function sendMessage() {
+          const text = msgInput.value.trim();
+          if (!text) return;
+          const el = document.createElement("div");
+          el.className = "bubble sent";
+          el.textContent = text;
+          messages.appendChild(el);
+          msgInput.value = "";
+          messages.scrollTop = messages.scrollHeight;
+        }
+
+
+        sendBtn.addEventListener("click", sendMessage);
+        msgInput.addEventListener("keydown", e => {
+          if (e.key === "Enter") sendMessage();
+        });
+
+
+        // إضافة وظائف مؤقتة للأزرار (بدون وظيفة فعلية)
+        document.getElementById("photoBtn").addEventListener("click", () => { console.log("إرسال صورة (لاحقاً)"); });
+        document.getElementById("micBtn").addEventListener("click",   () => { console.log("تسجيل صوت (لاحقاً)"); });
+
+
+      } else if (page === "members") {
+        // قائمة تجريبية للأعضاء
+        const members = [
+          { name: "علي مصطفى", id: "user123", avatar: "https://images.pexels.com/photos/1574681/pexels-photo-1574681.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500", online: true },
+          { name: "فاطمة الزهراء", id: "user456", avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500", online: false },
+          { name: "أحمد حامد", id: "user789", avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500", online: true },
+          { name: "ليلى محمود", id: "user012", avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500", online: true },
+          { name: "محمد السيد", id: "user345", avatar: "https://images.pexels.com/photos/936056/pexels-photo-936056.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500", online: false },
+        ];
+
+
+        // إنشاء المحتوى ديناميكياً
+        content.innerHTML = `
+          <section class="members-page">
+            <!-- شريط البحث -->
+            <div class="search-bar">
+              <input id="searchInput" type="text" placeholder="ابحث عن الأعضاء..." />
+              <button title="بحث">🔍</button>
+            </div>
+
+
+            <!-- قائمة الأعضاء -->
+            <div class="members-list" id="membersList">
+              ${members.map(member => `
+                <div class="member-item-wrapper">
+                  <div class="member-item">
+                    <img class="member-avatar" src="${member.avatar}" alt="${member.name}" />
+                    <div class="member-info">
+                      <h3 class="member-name">${member.name}</h3>
+                      <p class="member-id">${member.id}</p>
+                    </div>
+                    <div class="member-status ${member.online ? 'status-online' : 'status-offline'}"></div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+        `;
+
+
+        // وظيفة البحث
+        const searchInput = document.getElementById("searchInput");
+        searchInput.addEventListener("input", e => {
+          const searchTerm = e.target.value.toLowerCase();
+          document.querySelectorAll(".member-item-wrapper").forEach(el => {
+            const name = el.querySelector(".member-name").textContent.toLowerCase();
+            const id = el.querySelector(".member-id").textContent.toLowerCase();
+            if (name.includes(searchTerm) || id.includes(searchTerm)) {
+              el.style.display = "block";
+            } else {
+              el.style.display = "none";
+            }
+          });
+        });
+
+
+      } else if (page === "settings") {
+        content.innerHTML = `
+          <section class="settings-page">
+            <!-- قسم الإشعارات والوضع -->
+            <div class="settings-section">
+              <h2 class="settings-section-title">الإشعارات والوضع</h2>
+              <div class="settings-option">
+                <span class="label">تفعيل الإشعارات</span>
+                <button class="settings-btn-themed" id="notificationsBtn">🔔 تفعيل</button>
+              </div>
+              <div class="settings-option">
+                <span class="label">وضع التطبيق</span>
+                <button class="settings-btn-themed" id="themeBtn">☀️ فاتح</button>
+              </div>
+            </div>
+
+
+            <!-- قسم الخلفيات -->
+            <div class="settings-section">
+              <h2 class="settings-section-title">خلفية الدردشة</h2>
+              <div class="settings-option">
+                <span class="label">إضافة خلفية من الهاتف</span>
+                <input type="file" id="bgFile" accept="image/*" style="display:none;" />
+                <label for="bgFile" class="settings-btn-themed" style="cursor:pointer;">🏞️ اختيار ملف</label>
+                <button class="settings-btn-themed" id="confirmBgFileBtn">✓ تأكيد</button>
+              </div>
+              <div class="settings-option">
+                <span class="label">إضافة خلفية برابط</span>
+                <input type="text" id="bgUrlInput" class="settings-input-url" placeholder="الصق رابط الصورة هنا..." />
+                <button class="settings-btn-themed" id="confirmBgUrlBtn">✓ تأكيد</button>
+              </div>
+              <div class="settings-option">
+                <span class="label">إعادة ضبط الخلفية</span>
+                <button class="settings-btn-themed" id="resetBgBtn">🔄 إعادة ضبط</button>
+              </div>
+            </div>
+
+
+            <!-- قسم التنسيقات -->
+            <div class="settings-section">
+              <h2 class="settings-section-title">تنسيق الرسائل والفقاعات</h2>
+              <div class="settings-option">
+                <span class="label">لون خط الرسائل</span>
+                <input type="color" id="fontColorInput" class="settings-input" value="#000000" />
+              </div>
+              <div class="settings-option">
+                <span class="label">حجم الخط</span>
+                <div class="settings-range-container">
+                  <input type="range" id="fontSizeRange" class="settings-range" min="10" max="20" value="14" />
+                  <span id="fontSizeValue" class="settings-range-value">14</span>
+                </div>
+              </div>
+              <div class="settings-option">
+                <span class="label">لون خلفية فقاعاتي</span>
+                <input type="color" id="myBubbleBgInput" class="settings-input" value="#dcf8c6" />
+              </div>
+              <div class="settings-option">
+                <span class="label">لون خلفية فقاعات الآخرين</span>
+                <input type="color" id="otherBubbleBgInput" class="settings-input" value="#ffffff" />
+              </div>
+              <div class="settings-option">
+                <span class="label">شكل الفقاعات</span>
+                <button class="settings-btn-themed" id="bubbleShapeBtn">⭕ مستدير</button>
+              </div>
+              <div class="settings-option">
+                <span class="label">حجم الفقاعات</span>
+                <div class="settings-range-container">
+                  <input type="range" id="bubbleSizeRange" class="settings-range" min="70" max="90" value="75" />
+                  <span id="bubbleSizeValue" class="settings-range-value">75%</span>
+                </div>
+              </div>
+              <button class="settings-btn-themed" id="confirmFormattingBtn">✓ تأكيد التنسيقات</button>
+            </div>
+
+
+            <!-- قسم إعادة الضبط العام -->
+            <div class="settings-section">
+              <h2 class="settings-section-title">إعادة الضبط</h2>
+              <div class="settings-option">
+                <span class="label">إعادة ضبط جميع التعديلات</span>
+                <button class="settings-btn-themed" id="resetAllBtn">🗑️ إعادة ضبط</button>
+              </div>
+            </div>
+          </section>
+        `;
+
+
+        // تهيئة وظائف صفحة الإعدادات
+        document.getElementById("notificationsBtn").addEventListener("click", () => console.log("تفعيل/تعطيل الإشعارات"));
+        document.getElementById("themeBtn").addEventListener("click", () => console.log("تبديل الوضع"));
+        document.getElementById("bgFile").addEventListener("change", () => console.log("اختيار خلفية من ملف"));
+        document.getElementById("confirmBgFileBtn").addEventListener("click", () => console.log("تأكيد إضافة خلفية من الهاتف"));
+        document.getElementById("bgUrlInput").addEventListener("change", () => console.log("إضافة خلفية من رابط"));
+        document.getElementById("confirmBgUrlBtn").addEventListener("click", () => console.log("تأكيد إضافة خلفية..."));
+        document.getElementById("resetBgBtn").addEventListener("click", () => console.log("إعادة ضبط الخلفية"));
+        document.getElementById("confirmFormattingBtn").addEventListener("click", () => console.log("تأكيد التنسيقات"));
+        document.getElementById("resetAllBtn").addEventListener("click", () => console.log("إعادة ضبط الكل"));
+
+
+        // وظيفة تحديث قيمة النطاق
+        function updateRangeValue(rangeId, valueId, suffix = '') {
+          const range = document.getElementById(rangeId);
+          const value = document.getElementById(valueId);
+          if (range && value) {
+            value.textContent = range.value + suffix;
+            range.addEventListener("input", (e) => {
+              value.textContent = e.target.value + suffix;
+            });
+          }
+        }
+
+
+        updateRangeValue("fontSizeRange", "fontSizeValue");
+        updateRangeValue("bubbleSizeRange", "bubbleSizeValue", "%");
+
+
+      } else if (page === "profile") {
+        content.innerHTML = `
+          <section class="profile-page">
+            <div class="profile-section">
+              <div class="profile-avatar-container">
+                <img class="profile-avatar" id="profileAvatar" src="${currentUser.avatar}" alt="My Avatar" />
+                <div class="profile-status status-online"></div>
+              </div>
+              <h2 class="profile-name" id="profileName">${currentUser.name}</h2>
+              <p class="profile-status-text">متصل</p>
+            </div>
+
+
+            <div class="profile-section">
+              <div class="profile-details-grid">
+                <div class="profile-detail-card">
+                  <p class="label">الجنس</p>
+                  <p class="value" id="profileGender">${currentUser.gender === 'male' ? 'ذكر' : 'أنثى'}</p>
+                </div>
+                <div class="profile-detail-card">
+                  <p class="label">اسم المستخدم</p>
+                  <p class="value" id="profileUsername">علي.م</p>
+                </div>
+                <div class="profile-detail-card">
+                  <p class="label">الموقع</p>
+                  <p class="value" id="profileLocation">القاهرة، مصر</p>
+                </div>
+                <div class="profile-detail-card">
+                  <p class="label">تاريخ التسجيل</p>
+                  <p class="value" id="profileJoinDate">2023-01-15</p>
+                </div>
+              </div>
+              <button class="profile-edit-btn" onclick="showAuthPage('editProfile')">تعديل الملف الشخصي</button>
+            </div>
+          </section>
+        `;
+      }
+    }
+
+
+    /**
+     * يعرض صفحات المصادقة (تسجيل الدخول، التسجيل، تعديل الملف الشخصي)
+     * @param {string} type - نوع صفحة المصادقة ('initial' or 'signup' or 'editProfile')
+     */
+    function showAuthPage(type) {
+      const content = document.getElementById("content");
+      if (type === 'initial') {
+        content.innerHTML = `
+          <section class="auth-page" id="initialAuthPage">
+            <h1 class="auth-title">شات شهاب</h1>
+            <div class="auth-card">
+              <div class="auth-input-group">
+                <label for="loginName">اسم المستخدم</label>
+                <input type="text" id="loginName" class="auth-input" placeholder="اسم المستخدم" />
+              </div>
+              <div class="auth-input-group">
+                <label for="loginPassword">كلمة المرور</label>
+                <input type="password" id="loginPassword" class="auth-input" placeholder="كلمة المرور" />
+              </div>
+              <button class="form-btn-confirm" onclick="openPage('chat', document.querySelector('.nav-btn'))">دخول</button>
+              <p class="form-text">ليس لديك حساب؟ <span class="form-text-link" onclick="showAuthPage('signup')">تسجيل جديد</span></p>
+            </div>
+          </section>
+        `;
+      } else if (type === 'signup') {
+        content.innerHTML = `
+          <section class="auth-page" id="signupPage">
+            <h1 class="auth-title">تسجيل جديد</h1>
+            <div class="auth-card">
+              <div class="profile-avatar-upload">
+                <div class="signup-avatar-container">
+                  <img class="signup-avatar" id="signupAvatar" src="https://images.pexels.com/photos/2055230/pexels-photo-2055230.jpeg" alt="Avatar" />
+                </div>
+                <div class="signup-avatar-actions">
+                  <button class="signup-avatar-btn" id="signupRandomAvatarBtn">صورة عشوائية</button>
+                  <label class="signup-avatar-btn" for="signupFile">اختيار من الهاتف</label>
+                  <input type="file" id="signupFile" accept="image/*" style="display:none;" />
+                </div>
+              </div>
+              <div class="auth-input-group">
+                <label for="signupName">اسم المستخدم</label>
+                <input type="text" id="signupName" class="auth-input" placeholder="اسم المستخدم" />
+              </div>
+              <div class="auth-input-group">
+                <label for="signupPassword">كلمة المرور</label>
+                <input type="password" id="signupPassword" class="auth-input" placeholder="كلمة المرور" />
+              </div>
+              <div class="gender-select">
+                <div class="gender-option selected" data-gender="male" id="genderMale">ذكـر</div>
+                <div class="gender-option" data-gender="female" id="genderFemale">أنثـى</div>
+              </div>
+              <div class="form-btn-group">
+                <button class="form-btn-confirm" onclick="openPage('chat', document.querySelector('.nav-btn'))">إنشاء الحساب</button>
+                <button class="form-btn-cancel" onclick="showAuthPage('initial')">إلغاء</button>
+              </div>
+            </div>
+          </section>
+        `;
+        setupSignupListeners();
+      } else if (type === 'editProfile') {
+        content.innerHTML = `
+          <section class="auth-page" id="editProfilePage">
+            <h1 class="auth-title">تعديل الملف الشخصي</h1>
+            <div class="auth-card">
+              <div class="profile-avatar-upload">
+                <div class="signup-avatar-container">
+                  <img class="signup-avatar" id="editAvatar" src="${currentUser.avatar}" alt="Avatar" />
+                </div>
+                <div class="signup-avatar-actions">
+                  <button class="signup-avatar-btn" id="editRandomAvatarBtn">صورة عشوائية</button>
+                  <label class="signup-avatar-btn" for="editFile">اختيار من الهاتف</label>
+                  <input type="file" id="editFile" accept="image/*" style="display:none;" />
+                </div>
+              </div>
+              <div class="auth-input-group">
+                <label for="editName">اسم المستخدم</label>
+                <input type="text" id="editName" class="auth-input" value="${currentUser.name}" />
+              </div>
+              <div class="auth-input-group">
+                <label for="editPassword">كلمة المرور الجديدة</label>
+                <input type="password" id="editPassword" class="auth-input" placeholder="اكتب كلمة مرور جديدة" />
+              </div>
+              <div class="gender-select">
+                <div class="gender-option ${currentUser.gender === 'male' ? 'selected' : ''}" data-gender="male" id="editGenderMale">ذكـر</div>
+                <div class="gender-option ${currentUser.gender === 'female' ? 'selected' : ''}" data-gender="female" id="editGenderFemale">أنثـى</div>
+              </div>
+              <div class="form-btn-group">
+                <button class="form-btn-confirm" onclick="saveProfileChanges()">حفظ التعديلات</button>
+                <button class="form-btn-cancel" onclick="openPage('profile')">إلغاء</button>
+              </div>
+            </div>
+          </section>
+        `;
+        setupEditProfileListeners();
+      }
+    }
+
+
+    /**
+     * إعداد مستمعي الأحداث لصفحة التسجيل.
+     */
+    function setupSignupListeners() {
+        const genderOptions = document.querySelectorAll('.gender-option');
+        genderOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                genderOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+        });
+
+
+        const signupRandomAvatarBtn = document.getElementById("signupRandomAvatarBtn");
+        const signupFile = document.getElementById("signupFile");
+        let selectedGender = 'male';
+
+
+        genderOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                selectedGender = option.dataset.gender;
+            });
+        });
+
+
+        signupRandomAvatarBtn.addEventListener("click", () => {
+            const maleAvatars = [
+              "https://images.pexels.com/photos/2055230/pexels-photo-2055230.jpeg",
+              "https://images.pexels.com/photos/1574681/pexels-photo-1574681.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+              "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
+            ];
+            const femaleAvatars = [
+              "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
+              "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
+            ];
+            const avatars = selectedGender === 'male' ? maleAvatars : femaleAvatars;
+            const newAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+            document.getElementById("signupAvatar").src = newAvatar;
+            console.log("تم تعيين صورة عشوائية.");
+        });
+
+        document.getElementById("signupFile").addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                document.getElementById("signupAvatar").src = event.target.result;
+              };
+              reader.readAsDataURL(file);
+            }
+        });
+    }
+
+
+    /**
+     * إعداد مستمعي الأحداث لصفحة تعديل الملف الشخصي.
+     */
+    function setupEditProfileListeners() {
+      const genderOptions = document.querySelectorAll('.gender-option');
+      genderOptions.forEach(option => {
+          option.addEventListener('click', () => {
+              genderOptions.forEach(opt => opt.classList.remove('selected'));
+              option.classList.add('selected');
+              currentUser.gender = option.dataset.gender;
+          });
+      });
+
+
+      const editRandomAvatarBtn = document.getElementById("editRandomAvatarBtn");
+      editRandomAvatarBtn.addEventListener("click", () => {
+          const maleAvatars = [
+            "https://images.pexels.com/photos/2055230/pexels-photo-2055230.jpeg",
+            "https://images.pexels.com/photos/1574681/pexels-photo-1574681.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+            "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
+          ];
+          const femaleAvatars = [
+            "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
+            "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
+          ];
+          const avatars = currentUser.gender === 'male' ? maleAvatars : femaleAvatars;
+          const newAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+          document.getElementById("editAvatar").src = newAvatar;
+          currentUser.avatar = newAvatar;
+      });
+
+
+      document.getElementById("editFile").addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                  document.getElementById("editAvatar").src = event.target.result;
+                  currentUser.avatar = event.target.result;
+              };
+              reader.readAsDataURL(file);
+          }
+      });
+    }
+
+
+    function saveProfileChanges() {
+        // تحديث اسم المستخدم
+        const newName = document.getElementById("editName").value;
+        if (newName) {
+            currentUser.name = newName;
+            document.getElementById("profileName").textContent = newName;
+        }
+
+
+        // تحديث الجنس
+        document.getElementById("profileGender").textContent = currentUser.gender === 'male' ? 'ذكر' : 'أنثى';
+
+
+        // تحديث الصورة في الهيدر والبروفايل
+        document.querySelector(".chat-header .avatar").src = currentUser.avatar;
+        document.getElementById("profileAvatar").src = currentUser.avatar;
+
+
+        // العودة لصفحة البروفايل
+        openPage('profile', document.querySelector('[onclick="openPage(\'profile\', this)"]'));
+
+
+        console.log("تم حفظ التعديلات:", currentUser);
+    }
+
+  </script>
+</body>
+</html>
+
+
